@@ -9,6 +9,15 @@ services:
     ports:
       - "8000:8000"
 
+  consumer_securityunion:
+    command: cargo watch -x run
+    build:
+      context: ./consumer
+      cache_from:
+        - securityunion/rust-dev:latest
+    environment: 
+      QUEUE_ID: "securityunion"
+
   rabbit:
     image: "rabbitmq:latest"
     environment:

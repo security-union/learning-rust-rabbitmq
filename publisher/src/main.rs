@@ -37,7 +37,9 @@ fn publish_message(message: Json<Message>, state: RockState<Connection>) -> Json
     // Get the Arc and wait for the mutex lock
     let arc = state.inner().clone();
     let connection = arc.lock().unwrap();
+    // Open a rabbitmq channel
     let channel = connection.open_channel(None).expect("Unable to open channel");
+    // publish the message to the exchange
     let exchange = Exchange::direct(&channel);
     exchange.publish(Publish::new(msg_clone.msg.as_bytes(), msg_clone.queue_id)).expect("Unable to publish to exchange");
     message
