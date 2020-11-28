@@ -32,10 +32,10 @@ pub struct Message {
     format = "application/json",
     data = "<message>"
 )]
-fn post(message: Json<Message>, state: RockState<Connection>) -> Json<Message> {
+fn publish_message(message: Json<Message>, state: RockState<Connection>) -> Json<Message> {
     let msg_clone = message.clone();
-    let arc = state.inner();
-    let arc = arc.clone();
+    // Get the Arc and wait for the mutex lock
+    let arc = state.inner().clone();
     let connection = arc.lock().unwrap();
     let channel = connection.open_channel(None).expect("Unable to open channel");
     let exchange = Exchange::direct(&channel);
@@ -44,9 +44,9 @@ fn post(message: Json<Message>, state: RockState<Connection>) -> Json<Message> {
 }
 
 fn rocket() -> rocket::Rocket {
-    let mut connection = Connection::insecure_open("amqp://rabbitmq:rabbitmq@rabbit:5672").expect("Unable to reach rabbitmq");
+    let mut connection = Connection::insecure_open("amqp://guest:guest@localhost:5672").expect("Unable to reach rabbitmq");
     rocket::ignite().mount(
         "/rocket-test",
-        routes![post],
+        routes![publish_message],
     ).manage(Arc::new(Mutex::new(connection)))
 }
