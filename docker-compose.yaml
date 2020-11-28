@@ -1,7 +1,19 @@
-version: '2'
-
+version: "3.4"
 services:
-  rocket-test:
-    image: rocket-test
+  publisher:
+    command: cargo watch -x run
+    build:
+        context: ./publisher
+        cache_from:
+          - securityunion/rust-dev:latest
     ports:
       - "8000:8000"
+
+  rabbit:
+    image: "rabbitmq:latest"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+    ports:
+      - "5672:5672"
