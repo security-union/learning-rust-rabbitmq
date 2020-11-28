@@ -18,6 +18,15 @@ services:
     environment: 
       QUEUE_ID: "securityunion"
 
+  consumer_armore:
+    command: cargo watch -x run
+    build:
+      context: ./consumer
+      cache_from:
+        - securityunion/rust-dev:latest
+    environment: 
+      QUEUE_ID: "armore"
+
   rabbit:
     image: "rabbitmq:latest"
     environment:
