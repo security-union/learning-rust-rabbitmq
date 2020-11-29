@@ -36,7 +36,7 @@ fn publish_message(message: Json<Message>, state: RockState<Connection>) -> Json
     let msg_clone = message.clone();
     // Get the Arc and wait for the mutex lock
     let arc = state.inner().clone();
-    let connection = arc.lock().unwrap();
+    let mut connection = arc.lock().unwrap();
     let channel = connection.open_channel(None).expect("Unable to open channel");
     let exchange = Exchange::direct(&channel);
     exchange.publish(Publish::new(msg_clone.msg.as_bytes(), msg_clone.queue_id)).expect("Unable to publish to exchange");
@@ -44,7 +44,7 @@ fn publish_message(message: Json<Message>, state: RockState<Connection>) -> Json
 }
 
 fn rocket() -> rocket::Rocket {
-    let mut connection = Connection::insecure_open("amqp://guest:guest@localhost:5672").expect("Unable to reach rabbitmq");
+    let mut connection = Connection::insecure_open("amqp://rabbitmq:rabbitmq@rabbit:5672").expect("Unable to reach rabbitmq");
     rocket::ignite().mount(
         "/rocket-test",
         routes![publish_message],
